@@ -3,8 +3,6 @@
 #define DB_SIZE	10
 
 uint8_t transactionCounter = 0;
-int8_t accountIndex = -1;
-ST_accountsDB_t* referencePtr = 0;
 
 ST_accountsDB_t accountsDB[255] = {
 	{2000.0, RUNNING, "8989374615436851"},
@@ -28,27 +26,20 @@ EN_transState_t receiveTransactionData(ST_transaction_t* transData)
 	
 	if (isValidAccount(&transData->cardHolderData, &reference) == ACCOUNT_NOT_FOUND)
 	{
-		//transData->transState = FRAUD_CARD;
 		return FRAUD_CARD;
 	}
 	if (isAmountAvailable(&transData->terminalData, &reference) == LOW_BALANCE)
 	{
-		//transData->transState = DECLINED_INSUFFICIENT_FUND;
 		return DECLINED_INSUFFICIENT_FUND;
 	}
 	if (isBlockedAccount(&reference) == BLOCKED_ACCOUNT)
 	{
-		//transData->transState = DECLINED_STOLEN_CARD;
 		return DECLINED_STOLEN_CARD;
 	}
 	if (saveTransaction(transData) == SAVING_FAILED)
 	{
-		//transData->transState = INTERNAL_SERVER_ERROR;
 		return INTERNAL_SERVER_ERROR;
 	}
-
-	//transData->transState = APPROVED;
-//	accountsDB[accountIndex].balance -= transData->terminalData.transAmount;
 	return APPROVED;
 }
 
@@ -63,7 +54,6 @@ EN_serverError_t isValidAccount(ST_cardData_t* cardData, ST_accountsDB_t* accoun
 			return SERVER_OK;
 		}
 	}
-	//accountReference = NULL;
 	return ACCOUNT_NOT_FOUND;
 }
 
@@ -114,33 +104,36 @@ EN_serverError_t saveTransaction(ST_transaction_t* transData)
 // This function prints all transactions found in the transactions DB.
 void listSavedTransactions(void)
 {
-	printf("#########################\n");
-	printf("Transaction Sequence Number: %d\n", transactionDB->transactionSequenceNumber);
-	printf("Transaction Date: %s\n", transactionDB->terminalData.transactionDate);
-	printf("Transaction Amount: %.2f\n", transactionDB->terminalData.transAmount);
-	if (transactionDB->transState == APPROVED)
+	for (uint8_t i = 0; i < transactionCounter; i++)
 	{
-		printf("Transaction State: APPROVED\n");
+		printf("\n#########################\n");
+		printf("Transaction Sequence Number: %d\n", transactionDB[i].transactionSequenceNumber);
+		printf("Transaction Date: %s\n", transactionDB[i].terminalData.transactionDate);
+		printf("Transaction Amount: %.2f\n", transactionDB[i].terminalData.transAmount);
+		if (transactionDB[i].transState == APPROVED)
+		{
+			printf("Transaction State: APPROVED\n");
+		}
+		else if (transactionDB[i].transState == DECLINED_INSUFFICIENT_FUND)
+		{
+			printf("Transaction State: DECLINED_INSUFFICIENT_FUND\n");
+		}
+		else if (transactionDB[i].transState == DECLINED_STOLEN_CARD)
+		{
+			printf("Transaction State: DECLINED_STOLEN_CARD\n");
+		}
+		else if (transactionDB[i].transState == FRAUD_CARD)
+		{
+			printf("Transaction State: FRAUD_CARD\n");
+		}
+		else if (transactionDB[i].transState == INTERNAL_SERVER_ERROR)
+		{
+			printf("Transaction State: INTERNAL_SERVER_ERROR\n");
+		}
+		printf("Terminal Max Amount: %.2f\n", transactionDB[i].terminalData.maxTransAmount);
+		printf("Cardholder Name: %s\n", transactionDB[i].cardHolderData.cardHolderName);
+		printf("PAN: %s\n", transactionDB[i].cardHolderData.primaryAccountNumber);
+		printf("Card Expiration Date: %s\n", transactionDB[i].cardHolderData.cardExpirationDate);
+		printf("#########################\n");
 	}
-	else if (transactionDB->transState == DECLINED_INSUFFICIENT_FUND)
-	{
-		printf("Transaction State: DECLINED_INSUFFICIENT_FUND\n");
-	}
-	else if (transactionDB->transState == DECLINED_STOLEN_CARD)
-	{
-		printf("Transaction State: DECLINED_STOLEN_CARD\n");
-	}
-	else if (transactionDB->transState == FRAUD_CARD)
-	{
-		printf("Transaction State: FRAUD_CARD\n");
-	}
-	else if (transactionDB->transState == INTERNAL_SERVER_ERROR)
-	{
-		printf("Transaction State: INTERNAL_SERVER_ERROR\n");
-	}
-	printf("Terminal Max Amount: %.2f\n", transactionDB->terminalData.maxTransAmount);
-	printf("Cardholder Name: %s\n", transactionDB->cardHolderData.cardHolderName);
-	printf("PAN: %s\n", transactionDB->cardHolderData.primaryAccountNumber);
-	printf("Card Expiration Date: %s\n", transactionDB->cardHolderData.cardExpirationDate);
-	printf("#########################\n");
 }

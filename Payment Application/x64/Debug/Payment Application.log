@@ -1,10 +1,4 @@
 ﻿  app.c
-  card.c
-D:\College\egFWD\Project 1 Redo\Payment Application\Payment Application\Card\card.c(8,2): warning C4013: 'gets' undefined; assuming extern returning int
-D:\College\egFWD\Project 1 Redo\Payment Application\Payment Application\Card\card.c(14,26): warning C4267: 'initializing': conversion from 'size_t' to 'uint8_t', possible loss of data
-D:\College\egFWD\Project 1 Redo\Payment Application\Payment Application\Card\card.c(66,26): warning C4267: 'initializing': conversion from 'size_t' to 'uint8_t', possible loss of data
   server.c
-  terminal.c
-D:\College\egFWD\Project 1 Redo\Payment Application\Payment Application\Terminal\terminal.c(8,2): warning C4013: 'gets' undefined; assuming extern returning int
   Generating Code...
   Payment Application.vcxproj -> D:\College\egFWD\Project 1 Redo\Payment Application\x64\Debug\Payment Application.exe
